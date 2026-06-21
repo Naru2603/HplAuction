@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HPL 2026 Auction System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <!-- ========== LANDING PAGE ========== -->
+    <section id="landing-page" class="page active">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <span class="eyebrow">Welcome to Hunuman Premier League 2026</span>
+          <h1>HPL 2026 Auction System</h1>
+          <p>Manage your auction with interactive bidding, team management, and comprehensive auction summaries.</p>
+          <button id="start-auction-btn" class="primary-btn">View Teams</button>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-circle"></div>
+          <img src="images/hanuman-logo.png" alt="Hanuman Tarun Mandal - HPL Logo" class="hanuman-logo" />
+        </div>
+      </div>
+
+      <!-- Teams Showcase -->
+      <div class="landing-teams-section">
+        <h2>Participating Forts & Sponsors</h2>
+        <div id="landing-teams-grid" class="landing-teams-grid"></div>
+      </div>
+    </section>
+
+    <!-- ========== TEAMS SELECTION PAGE ========== -->
+    <section id="teams-page" class="page">
+      <div class="page-header">
+        <h2>Teams Overview</h2>
+        <p>Manage auction for all teams</p>
+      </div>
+      <div id="teams-grid" class="card-grid"></div>
+      
+      <div class="page-footer">
+        <button id="back-from-teams" class="ghost-btn">← Back</button>
+        <button id="start-set-auction-btn" class="primary-btn">Start Auction</button>
+      </div>
+    </section>
+
+    <!-- ========== AUCTION PAGE (FOR EACH SET) ========== -->
+    <section id="auction-page" class="page">
+      <!-- Set Progress Indicator -->
+      <div class="set-progress">
+        <div class="progress-header">
+          <h2 id="set-name">Set 1: Captains</h2>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span id="set-counter" class="set-counter">Set 1 of 7</span>
+            <button id="view-set-players-btn" class="secondary-btn" style="padding: 8px 16px; font-size: 0.9rem;">👁️ View All Players</button>
+          </div>
+        </div>
+        <p id="set-description" class="set-description">Select team captains - One per team</p>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progress-text">0 of 8 teams completed</span>
+        </div>
+      </div>
+
+      <!-- Player Card -->
+      <div class="auction-main-container">
+        <div class="player-display">
+          <div class="player-card-large">
+            <div class="player-image-wrapper">
+              <img id="player-photo" src="" alt="Player" class="player-photo" />
+            </div>
+            <div class="player-info">
+              <h3 id="player-name">Player Name</h3>
+              <p id="player-category" class="player-category">Professional Cricketer</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auction Controls -->
+        <div class="auction-controls">
+          <!-- Team Selection -->
+          <div class="control-section">
+            <label for="team-select">Select Team:</label>
+            <select id="team-select" class="form-select">
+              <option value="">-- Choose Team --</option>
+            </select>
+            <!-- Team Budget Display -->
+            <div id="team-budget-display" class="team-budget-display" style="display: none; margin-top: 10px;">
+              <p>Budget: ₹<span id="team-budget-remaining">10000</span> / ₹<span id="team-budget-total">10000</span></p>
+              <p class="budget-status"><strong id="team-budget-status">Not selected</strong></p>
+            </div>
+          </div>
+
+          <!-- Base Price Display -->
+          <div class="price-display">
+            <div class="price-info">
+              <span class="price-label">Base Price</span>
+              <span class="price-value">₹<span id="base-price">300</span></span>
+            </div>
+          </div>
+
+          <!-- Current Bid Display -->
+          <div class="bid-display">
+            <span class="bid-label">Current Bid</span>
+            <span class="bid-amount">₹<span id="bid-amount">300</span></span>
+            <span class="bid-increment" id="bid-increment">(+50)</span>
+          </div>
+
+          <!-- Bidding Buttons -->
+          <div class="button-group button-group-horizontal">
+            <button id="decrease-bid-btn" class="secondary-btn btn-bid">- Decrease Bid</button>
+            <button id="bid-btn" class="secondary-btn btn-bid">+ Increase Bid</button>
+          </div>
+
+          <div class="button-group">
+            <button id="sold-btn" class="success-btn btn-sold">✓ Mark as Sold</button>
+          </div>
+
+          <!-- Undo Button -->
+          <div class="button-group">
+            <button id="previous-player-btn" class="secondary-btn">↶ Previous Player (Undo Last Selection)</button>
+          </div>
+
+          <!-- Player Counter -->
+          <div class="auction-info">
+            <p id="player-counter">Player <span id="current-player">1</span> of <span id="total-players">8</span></p>
+          </div>
+
+          <!-- Unsold Players in Set -->
+          <div class="unsold-players-info">
+            <p>Remaining players in set: <strong id="unsold-count">8</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page Navigation -->
+      <div class="page-footer">
+        <button id="back-from-auction" class="ghost-btn">← Back</button>
+        <button id="summary-btn" class="secondary-btn">Summary</button>
+        <button id="next-set-btn" class="primary-btn">Next Set</button>
+      </div>
+    </section>
+
+    <!-- ========== AUCTION SUMMARY PAGE ========== -->
+    <section id="summary-page" class="page">
+      <div class="page-header">
+        <h2>Auction Summary</h2>
+        <p>View auction results for all sets</p>
+      </div>
+
+      <!-- Summary Statistics -->
+      <div class="summary-stats">
+        <div class="stat-card">
+          <span class="stat-label">Current Set</span>
+          <span class="stat-value" id="summary-current-set">Set 1</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Total Players Sold</span>
+          <span class="stat-value" id="summary-total-sold">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Total Amount Spent</span>
+          <span class="stat-value">₹<span id="summary-total-amount">0</span></span>
+        </div>
+      </div>
+
+      <!-- Set Tabs -->
+      <div class="summary-tabs">
+        <div id="set-tabs-container" class="set-tabs-container">
+          <!-- Set tabs will be generated here -->
+        </div>
+      </div>
+
+      <!-- Teams Summary (for current set) -->
+      <div id="teams-summary-container" class="teams-summary-container">
+        <h3>Teams & Their Picks</h3>
+        <div id="teams-summary" class="teams-summary">
+          <!-- Team summaries will be populated here -->
+        </div>
+      </div>
+
+      <!-- Sold Players List (for current set) -->
+      <div class="sold-players-section">
+        <h3>All Sold Players (Current Set)</h3>
+        <div id="sold-players-list" class="sold-players-list">
+          <!-- Sold players will be listed here -->
+        </div>
+      </div>
+
+      <!-- Page Navigation -->
+      <div class="page-footer">
+        <button id="back-from-summary" class="ghost-btn">← Back to Auction</button>
+      </div>
+    </section>
+
+    <!-- ========== FINAL SUMMARY PAGE ========== -->
+    <section id="final-summary-page" class="page">
+      <div class="page-header">
+        <h2>Final Auction Summary</h2>
+        <p>Complete auction results for all sets</p>
+      </div>
+
+      <!-- Overall Statistics -->
+      <div class="summary-stats">
+        <div class="stat-card">
+          <span class="stat-label">Total Sets</span>
+          <span class="stat-value">7</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Total Players Sold</span>
+          <span class="stat-value" id="final-total-sold">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Grand Total Spent</span>
+          <span class="stat-value">₹<span id="final-total-amount">0</span></span>
+        </div>
+      </div>
+
+      <!-- Team Roster by Set -->
+      <div id="final-summary-by-team" class="final-summary-by-team">
+        <!-- Will be populated dynamically -->
+      </div>
+
+      <!-- Page Navigation -->
+      <div class="page-footer">
+        <button id="back-from-final-summary" class="ghost-btn">← Back</button>
+        <button id="download-summary-btn" class="secondary-btn">⬇️ Download Summary</button>
+        <button id="restart-auction-btn" class="primary-btn">Start New Auction</button>
+      </div>
+    </section>
+
+    <!-- ========== TEAM DETAILS MODAL ========== -->
+    <div id="team-details-modal" class="team-details-modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-team-name">Team Name</h2>
+          <button id="close-modal" class="modal-close" onclick="UIRenderer.closeTeamDetailsModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-team-info">
+            <img id="modal-team-logo" src="" alt="Team Logo" class="modal-team-logo" />
+            <div class="modal-team-details">
+              <p><strong>Sponsor:</strong> <span id="modal-team-sponsor">N/A</span></p>
+              <p><strong>Color:</strong> <span id="modal-team-color">N/A</span></p>
+            </div>
+          </div>
+          
+          <div class="modal-squad">
+            <h3>Squad Members</h3>
+            <div id="modal-team-squad" class="squad-members">
+              <!-- Will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="ghost-btn" onclick="UIRenderer.closeTeamDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SET PLAYERS MODAL ========== -->
+    <div id="set-players-modal" class="team-details-modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-set-name">Set Players</h2>
+          <button id="close-set-players-modal" class="modal-close" onclick="UIRenderer.closeSetPlayersModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-set-description" style="color: var(--text-muted); margin-bottom: 20px;"></p>
+          <div id="modal-set-players" class="squad-members">
+            <!-- Will be populated dynamically with all players in set -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="ghost-btn" onclick="UIRenderer.closeSetPlayersModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <!-- ✅ jsPDF for PDF download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- ✅ Configuration -->
+  <script src="config.js"></script>
+  <!-- ✅ State Management -->
+  <script src="state-manager.js"></script>
+  <!-- ✅ UI Renderer -->
+  <script src="ui-renderer.js"></script>
+  <!-- ✅ Main Script -->
+  <script src="script.js"></script>
+  <!-- ✅ Custom Enhancements (must load last after stateManager is initialized) -->
+  <script src="enhancements.js"></script>
+</body>
+</html>
